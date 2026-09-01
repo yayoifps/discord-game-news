@@ -1,6 +1,6 @@
 # ゲーム業界ニュース Discord自動配信
 
-パソコンを起動していなくても、GitHub Actionsが1日2回(JST 8:00 / 20:00)自動でゲーム業界のニュースを収集し、Discordチャンネルに配信します。
+パソコンを起動していなくても、GitHub Actionsが1日4回(JST 8:00 / 12:00 / 18:00 / 21:00)自動でゲーム業界のニュースを収集し、Discordチャンネルに配信します。
 
 - 国内メディア: 4Gamer, AUTOMATON, Game*Spark, INSIDE
 - 海外メディア(自動翻訳): IGN, GameSpot, PC Gamer, Eurogamer, Polygon
@@ -41,7 +41,7 @@ git push -u origin main
 2. `Game News to Discord` ワークフローを選択し、`Run workflow` で手動実行してテストする
 3. Discordチャンネルにニュースが届けば成功
 
-以降は `cron` の設定に従い、1日2回自動的にニュースが配信されます。
+以降は `cron` の設定に従い、1日4回自動的にニュースが配信されます。
 
 ## カスタマイズ
 
