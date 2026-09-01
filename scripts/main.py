@@ -29,6 +29,11 @@ RETENTION_DAYS = 30
 REQUEST_TIMEOUT = 10
 USER_AGENT = "Mozilla/5.0 (compatible; GameNewsBot/1.0)"
 
+OG_IMAGE_PATTERNS = [
+    re.compile(r'<meta[^>]+property="og:image"[^>]+content="([^"]+)"'),
+    re.compile(r'<meta[^>]+content="([^"]+)"[^>]+property="og:image"'),
+]
+
 
 def load_sent() -> dict:
     if not DATA_FILE.exists():
@@ -124,10 +129,30 @@ def extract_image_url(entry: dict) -> str:
     return ""
 
 
+def fetch_og_image(url: str) -> str:
+    """RSSに画像が無い場合のフォールバック: 記事ページのOGP画像(og:image)を取得する。
+
+    取得できなければ(通信失敗・見つからない等)空文字列を返し、処理は継続する。
+    """
+    if not url:
+        return ""
+    try:
+        resp = requests.get(url, headers={"User-Agent": USER_AGENT}, timeout=REQUEST_TIMEOUT)
+        resp.raise_for_status()
+    except requests.RequestException:
+        return ""
+
+    for pattern in OG_IMAGE_PATTERNS:
+        match = pattern.search(resp.text)
+        if match:
+            return match.group(1)
+    return ""
+
+
 def build_article(feed_def: dict, entry: dict) -> dict:
     title = clean_text(entry.get("title", "(タイトルなし)"))
     summary = summarize(entry.get("summary", "") or entry.get("description", ""))
-    image_url = extract_image_url(entry)
+    image_url = extract_image_url(entry) or fetch_og_image(entry.get("link", ""))
 
     if feed_def["lang"] == "en":
         title = translate_to_ja(title)
