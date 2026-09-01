@@ -18,7 +18,7 @@ import feedparser
 import requests
 
 from discord_notify import send_articles
-from sources import CATEGORY_COLOR, CATEGORY_LABEL, FEEDS
+from sources import FEEDS
 from translate import translate_to_ja
 
 DATA_FILE = Path(__file__).resolve().parent.parent / "data" / "sent_articles.json"
@@ -106,15 +106,15 @@ def build_article(feed_def: dict, entry: dict) -> dict:
 
     if feed_def["lang"] == "en":
         title = translate_to_ja(title)
-        summary = translate_to_ja(summary)
+        if summary:
+            summary = translate_to_ja(summary)
 
     return {
         "title": title,
-        "summary": summary or "(概要なし)",
+        "summary": summary,  # RSSに概要が無いソースでは空文字列になりうる
         "link": entry.get("link", ""),
         "source": feed_def["name"],
-        "category_label": CATEGORY_LABEL[feed_def["category"]],
-        "color": CATEGORY_COLOR[feed_def["category"]],
+        "category": feed_def["category"],
     }
 
 
