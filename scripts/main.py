@@ -22,7 +22,8 @@ from sources import FEEDS
 from translate import translate_to_ja
 
 DATA_FILE = Path(__file__).resolve().parent.parent / "data" / "sent_articles.json"
-MAX_ARTICLES_PER_RUN = 20
+# Discordの1メッセージあたりembed上限(10件)に合わせて、1回の配信件数もこれに揃える
+MAX_ARTICLES_PER_RUN = 10
 SUMMARY_MAX_LEN = 120
 RETENTION_DAYS = 30
 REQUEST_TIMEOUT = 10
@@ -100,9 +101,33 @@ def collect_new_articles(sent: dict) -> list:
     return candidates[:MAX_ARTICLES_PER_RUN]
 
 
+def extract_image_url(entry: dict) -> str:
+    """記事のサムネイル画像URLを取得する。見つからなければ空文字列。"""
+    media_thumbnail = entry.get("media_thumbnail")
+    if media_thumbnail and media_thumbnail[0].get("url"):
+        return media_thumbnail[0]["url"]
+
+    for m in entry.get("media_content", []):
+        m_type = m.get("type", "")
+        if m.get("url") and (not m_type or m_type.startswith("image")):
+            return m["url"]
+
+    for link in entry.get("links", []):
+        if link.get("rel") == "enclosure" and link.get("type", "").startswith("image"):
+            return link.get("href", "")
+
+    # 本文HTML(summary)に埋め込まれたimgタグから拾う(AUTOMATON等)
+    match = re.search(r'<img[^>]+src="([^"]+)"', entry.get("summary", "") or "")
+    if match:
+        return match.group(1)
+
+    return ""
+
+
 def build_article(feed_def: dict, entry: dict) -> dict:
     title = clean_text(entry.get("title", "(タイトルなし)"))
     summary = summarize(entry.get("summary", "") or entry.get("description", ""))
+    image_url = extract_image_url(entry)
 
     if feed_def["lang"] == "en":
         title = translate_to_ja(title)
@@ -115,6 +140,7 @@ def build_article(feed_def: dict, entry: dict) -> dict:
         "link": entry.get("link", ""),
         "source": feed_def["name"],
         "category": feed_def["category"],
+        "image_url": image_url,
     }
 
 
