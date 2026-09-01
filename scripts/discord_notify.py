@@ -18,7 +18,7 @@ def _build_embed(article: dict) -> dict:
     if article["summary"]:
         embed["description"] = article["summary"][:4096]
     if article.get("image_url"):
-        embed["thumbnail"] = {"url": article["image_url"]}
+        embed["image"] = {"url": article["image_url"]}
     return embed
 
 
