@@ -2,10 +2,12 @@ name: Game News to Discord
 
 on:
   schedule:
-    - cron: '0 23 * * *'  # UTC 23:00 = JST 8:00
-    - cron: '0 3 * * *'   # UTC 3:00  = JST 12:00
-    - cron: '0 9 * * *'   # UTC 9:00  = JST 18:00
-    - cron: '0 12 * * *'  # UTC 12:00 = JST 21:00
+    # 毎時0分は全世界のリポジトリが一斉予約して混雑し遅延しやすいため、数分ずらしてある
+    # (GitHub Actionsのschedule実行は時刻を保証しないため、それでも多少のズレは起こりうる)
+    - cron: '7 22 * * *'   # UTC 22:07 = JST 7:07起動 → 目安JST 8:00
+    - cron: '13 2 * * *'   # UTC 2:13  = JST 11:13起動 → 目安JST 12:00
+    - cron: '22 8 * * *'   # UTC 8:22  = JST 17:22起動 → 目安JST 18:00
+    - cron: '38 11 * * *'  # UTC 11:38 = JST 20:38起動 → 目安JST 21:00
   workflow_dispatch: {}
 
 permissions:

@@ -8,6 +8,13 @@ MAX_EMBEDS = 10  # Discordの1メッセージあたりembed上限
 TIMEOUT = 10
 
 
+def _redact(text: str, webhook_url: str) -> str:
+    """例外メッセージ等にWebhook URLが紛れ込んだ場合に伏せる(公開ログ対策)。"""
+    if webhook_url:
+        text = text.replace(webhook_url, "[REDACTED]")
+    return text
+
+
 def _build_embed(article: dict) -> dict:
     embed = {
         "title": article["title"][:256],
@@ -48,7 +55,7 @@ def send_articles(webhook_url: str, articles: list, dry_run: bool = False) -> li
         resp = requests.post(webhook_url, json=payload, timeout=TIMEOUT)
         resp.raise_for_status()
     except requests.RequestException as e:
-        print(f"Discordへの送信に失敗しました: {e}")
+        print(f"Discordへの送信に失敗しました: {_redact(str(e), webhook_url)}")
         return []
 
     return articles
