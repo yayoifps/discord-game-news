@@ -1,6 +1,6 @@
 # ゲーム業界ニュース Discord自動配信
 
-パソコンを起動していなくても、GitHub Actionsが1日4回(JST 8:00 / 12:00 / 18:00 / 21:00)自動でゲーム業界のニュースを収集し、Discordチャンネルに配信します。
+パソコンを起動していなくても、GitHub Actionsが1日4回(JST 6:00 / 12:00 / 18:00 / 21:00)自動でゲーム業界のニュースを収集し、Discordチャンネルに配信します。
 
 - 国内メディア: 4Gamer, AUTOMATON, Game*Spark, INSIDE
 - 海外メディア(自動翻訳): IGN, GameSpot, PC Gamer, Eurogamer, Polygon
